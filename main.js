@@ -7,16 +7,30 @@ class block{
         this.previousHash=previousHash.hash;
         this.data=data;
         this.hash=this.calculateHash();
+        this.nonce=0;
     }
     calculateHash()
     {
-        return SHA(this.index+this.timestamp+this.previousHash+JSON.stringify(this.data)).toString();
+        return SHA(this.index+this.timestamp+this.previousHash+JSON.stringify(this.data)+this.nonce).toString();
+    }
+    mineBlock(difficulty)
+    {
+        
+        while(this.hash.substring(0,difficulty)!==Array(difficulty+1).join("0"))
+        {
+            this.nonce++;
+            this.hash=this.calculateHash();
+
+        }
+        console.log(this.nonce);
+        console.log("block Mined:"+ this.hash);
     }
 };
 class blockchain{
     constructor()
     {
         this.chain=[this.createGenesisBlock()];
+        this.difficulty=4;
     }
     createGenesisBlock()
     {
@@ -29,7 +43,8 @@ class blockchain{
     addBlock(newBlock)
     {  
         newBlock.previousHash=this.getLatestBlock().hash;
-        newBlock.hash=newBlock.calculateHash();
+        // newBlock.hash=newBlock.calculateHash();   easy to temper
+        newBlock.mineBlock(this.difficulty+1);
         this.chain.push(newBlock);
     }
     isChainValid()
@@ -52,10 +67,13 @@ var dhruvCoin= new blockchain();
 
 dhruvCoin.addBlock(new block(1,"1/1/2022",{amount:2}))
 dhruvCoin.addBlock(new block(2,"2/1/2022",{amount:4}))
-dhruvCoin.addBlock(new block(3,"4/1/2022",{amount:27}))
-console.log(JSON.stringify(dhruvCoin,null,4));
-console.log(dhruvCoin.isChainValid());
-dhruvCoin.chain[2].data={amount:999}
-console.log(dhruvCoin.isChainValid());
-dhruvCoin.chain[2].data={amount:4}
-console.log(dhruvCoin.isChainValid());
+// dhruvCoin.addBlock(new block(3,"4/1/2022",{amount:27}))
+
+//few initial tests 
+
+// console.log(JSON.stringify(dhruvCoin,null,4));
+// console.log(dhruvCoin.isChainValid());
+// dhruvCoin.chain[2].data={amount:999}
+// console.log(dhruvCoin.isChainValid());
+// dhruvCoin.chain[2].data={amount:4}
+// console.log(dhruvCoin.isChainValid());
